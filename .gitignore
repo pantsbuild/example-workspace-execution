@@ -1,0 +1,4 @@
+/.pants.d
+
+bazel-jvm/bazel-*
+
