@@ -22,12 +22,32 @@ shell_command(
   timeout=600,
 )
 
-# For the sake of this example, we will just output the `ls -l` output to demonstrate
-# that the jar built by Bazel is visible to Pants.
+
+# The following two `system_binary` targets allow Pants to find Coursier.
+# The `run_shell_command` target below will use Coursier to execute the jar file
+# built by Bazel.
+system_binary(
+  name="sh",
+  binary_name="sh",
+)
+
+system_binary(
+  name="coursier",
+  binary_name="coursier",
+  fingerprint_args=["version"],
+  fingerprint_dependencies=[":sh"],
+)
+
+# Execute the jar file produced by Bazel.
+# - The jar file is visible to this target because it is listed as an
+#   "execution dependency."
+# - Coursier is made available on the PATH because the applicable `system_binary`
+#   target is listed as an `execution_dependency`.
 run_shell_command(
   name="run-from-bazel",
-  command="ls -l {chroot}",
+  command="coursier java -cp {chroot}/ProjectRunner.jar com.example.ProjectRunner",
   execution_dependencies=[":bazel-jvm-binary"],
+  runnable_dependencies=[":coursier", ":sh"],
 )
 
 # This target configures in-workspace execution support. A few points of note:
