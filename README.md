@@ -4,7 +4,7 @@ This example project demonstrates the "in-workspace" execution support in Pants 
 
 ## Overview
 
-This example project integrates Pants with Bazel to build a small Java program. (Pants has Java support so this example is somewhat contrived, but the point is demonstrate integration with a third party build tool, not the partculars of the example.)
+This example project integrates Pants with Bazel to build a small Java program. (Pants has Java support so this example is somewhat contrived, but the point is demonstrate integration with a third party build tool, not the particulars of the example.)
 
 Some items to be aware of:
 
