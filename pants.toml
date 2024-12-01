@@ -1,0 +1,24 @@
+[GLOBAL]
+pants_version = "2.23.0"
+backend_packages.add = [
+  "pants.backend.shell",
+  "pants.backend.experimental.adhoc",
+]
+pants_ignore = [
+  # Ignore Bazel's output directories.
+  "bazel-jvm/bazel-*/**"
+]
+build_ignore = [
+  # Ignore Bazel's BUILD files in the Bazel project.
+  "bazel-jvm/BUILD*",
+  "bazel-jvm/**/BUILD*",
+]
+
+[source]
+root_patterns = ["/"]
+
+[anonymous-telemetry]
+enabled = false
+
+[environments-preview.names]
+workspace = "//:workspace"
