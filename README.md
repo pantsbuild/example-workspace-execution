@@ -4,7 +4,7 @@ This example project demonstrates the "in-workspace" execution support in Pants 
 
 ## Overview
 
-This example project integrates Pants with Bazel to build a small Java program. (Pants has Java support so this example is somewhat contrived, but the point is demonstrate integration with a third party build tool, not the particulars of the example.)
+This example project integrates Pants with Bazel to build a small Java program. (Pants has Java support so this example is very much contrived, but the point is demonstrate integration with a third party build tool, not to focus too much on details of this particular example.)
 
 Some items to be aware of:
 
@@ -14,8 +14,11 @@ Some items to be aware of:
 
 ## Running
 
-1. Run `pants run //:run-from-bazel`. The output should be the size of the
-   jar file captured from the in-workspace execution (as printed by `ls`).
+1. Ensure you have Bazel and Docker both installed somewhere on the `PATH`.
+
+2. Run `pants package //:project_image`. This will produce a Docker image with the jar file produced by Bazel.
+
+3. Execute the Docker image: `docker run project_image:latest`. You should see the output: `Hello!`
 
 ## Additional Reading
 

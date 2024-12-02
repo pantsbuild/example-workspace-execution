@@ -1,4 +1,12 @@
-# This target is what invokes Bazel. The main point to note here is that the `{chroot}` symbol is replaced with the path to the temporary directory used during execution to materialize Pants-supplied inputs. 
+# This target invokes Bazel to produce a jar file. The example is contrived since Pants has JVM support,
+# but the main focal point here is demonstrating Pants invoking a third party build tool and then
+# consuming that tool's output (and not the particular details of this example).
+#
+# Please note that the `{chroot}` symbol is replaced with the path to a temporary directory created
+# during execution to materialize Pants-supplied inputs.
+#
+# Moreover, the `{chroot}` directory is also used by Pants for capturing outputs from this process. (Thus,
+# the jar file is copied to the `{chroot}` directory to make it visible to Pants.)
 shell_command(
   name="bazel-jvm-binary",
   command="bazel build --java_runtime_version=remotejdk_11 :ProjectRunner && cp bazel-bin/ProjectRunner.jar {chroot} && ls {chroot}",
@@ -13,41 +21,28 @@ shell_command(
   environment="__local_workspace__",
 
   # The `path_env_modify` field allows you to disable modification of the PATH environment
-  # variable by Pants. Since Bazel may incorporate the exact PATH value into its cache
-  # key, this reduces the non-deteriminsm to invoking Bazel to allow Bazel to use its 
-  # cache more effectively.
+  # variable by Pants. Since Bazel incorporates the exact PATH value into its cache
+  # keys, this allows Bazel to actually use its cache (versus having to rebuild everything each 
+  # time since the PATH will differ).
   path_env_modify="off",
 
   # Configure a longer timeout to give Bazel a chance to complete when necessary.
   timeout=600,
 )
 
-
-# The following two `system_binary` targets allow Pants to find Coursier.
-# The `run_shell_command` target below will use Coursier to execute the jar file
-# built by Bazel.
-system_binary(
-  name="sh",
-  binary_name="sh",
-)
-
-system_binary(
-  name="coursier",
-  binary_name="coursier",
-  fingerprint_args=["version"],
-  fingerprint_dependencies=[":sh"],
-)
-
-# Execute the jar file produced by Bazel.
-# - The jar file is visible to this target because it is listed as an
-#   "execution dependency."
-# - Coursier is made available on the PATH because the applicable `system_binary`
-#   target is listed as an `execution_dependency`.
-run_shell_command(
-  name="run-from-bazel",
-  command="coursier java -cp {chroot}/ProjectRunner.jar com.example.ProjectRunner",
-  execution_dependencies=[":bazel-jvm-binary"],
-  runnable_dependencies=[":coursier", ":sh"],
+# Build a Docker image which embeds the jar produced by Bazel via the //:bazel-jvm-binary target.
+# Note: The jar file is visible to this target because it is listed as a dependency.
+docker_image(
+  name="project_image",
+  instructions=[
+    "FROM openjdk:24-jdk-slim-bullseye",
+    "WORKDIR /app",
+    "COPY ProjectRunner.jar .",
+    'ENTRYPOINT ["java", "-cp", "ProjectRunner.jar", "com.example.ProjectRunner"]',
+  ],
+  dependencies=[
+    ":bazel-jvm-binary",
+  ],
 )
 
 # This target configures in-workspace execution support. A few points of note:
