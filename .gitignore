@@ -1,4 +1,5 @@
 /.pants.d
+/dist
 
 bazel-jvm/bazel-*
 
