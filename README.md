@@ -16,9 +16,7 @@ Some items to be aware of:
 
 1. Ensure you have Bazel and Docker both installed somewhere on the `PATH`.
 
-2. Run `pants package //:project_image`. This will produce a Docker image with the jar file produced by Bazel.
-
-3. Execute the Docker image: `docker run project_image:latest`. You should see the output: `Hello!`
+2. Run `pants run //:project_image`. This will produce a Docker image with the jar file produced by Bazel and run the resulting image.  You should see the output: `Hello!`
 
 ## Additional Reading
 
