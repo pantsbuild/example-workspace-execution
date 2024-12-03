@@ -3,6 +3,7 @@ pants_version = "2.23.0"
 backend_packages.add = [
   "pants.backend.shell",
   "pants.backend.experimental.adhoc",
+  "pants.backend.docker",
 ]
 pants_ignore = [
   # Ignore Bazel's output directories.
@@ -22,3 +23,10 @@ enabled = false
 
 [environments-preview.names]
 workspace = "//:workspace"
+
+# Note: Pants required this `interpreter_constraints` config for some reason even though Python
+# is not configured in this repository. Ordinarilly, you would pin a specific minor release of Python,
+# (e.g., `==3.9.*`) but since this repository is intended as a general example, this config accepts
+# any Python above v3.9 you may have in the interest of not forcing a specific Python version on you.
+[python]
+interpreter_constraints = ">=3.9"
